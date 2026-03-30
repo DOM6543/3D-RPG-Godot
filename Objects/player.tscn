@@ -1,0 +1,146 @@
+[gd_scene load_steps=11 format=3 uid="uid://cbedn3rs2svnl"]
+
+[ext_resource type="Script" uid="uid://b7gwo8bn620xp" path="res://Scripts/player.gd" id="1_y0qk3"]
+[ext_resource type="PackedScene" uid="uid://cx1lg4ovf0or1" path="res://Models/Sword.glb" id="2_3y5cq"]
+[ext_resource type="Texture2D" uid="uid://bpmaw8fxbr0i2" path="res://Sprites/healthbarbacunder.png" id="3_0ad8t"]
+[ext_resource type="Texture2D" uid="uid://dg4i5s0de1nfx" path="res://Sprites/healthbarover.png" id="4_x20fu"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ojbdc"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_y0qk3"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="Animation" id="Animation_2i4gt"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D/SwordPoint/Sword:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.25, 0.65, -0.25)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D/SwordPoint/Sword:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1.3089969, 3.0543263)]
+}
+
+[sub_resource type="Animation" id="Animation_3y5cq"]
+resource_name = "SwordSwing"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D/SwordPoint/Sword:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.25, 0.65, -0.25), Vector3(0.14123374, 0.63189006, -0.25), Vector3(0.25, 0.65, -0.25)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D/SwordPoint/Sword:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 1.3089969, 3.0543263), Vector3(-0.29450673, 1.6076214, 1.7886873), Vector3(0, 1.3089969, 3.0543263)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.26666668),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"deal_damage"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0ad8t"]
+_data = {
+&"RESET": SubResource("Animation_2i4gt"),
+&"SwordSwing": SubResource("Animation_3y5cq")
+}
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0ad8t"]
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_y0qk3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_ojbdc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_y0qk3")
+skeleton = NodePath("../CollisionShape3D")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_0ad8t")
+}
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.69164073, 0)
+
+[node name="SwordPoint" type="Node3D" parent="Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.69164073, 0)
+
+[node name="Sword" parent="Camera3D/SwordPoint" instance=ExtResource("2_3y5cq")]
+transform = Transform3D(-0.07735025, -0.0067672594, 0.2897776, 0.026146691, -0.29885828, 0, 0.28867504, 0.025255753, 0.07764569, 0.25, 0.65, -0.25)
+
+[node name="AttackCooldown" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="HPbar" type="TextureProgressBar" parent="HUD"]
+offset_left = 56.0
+offset_top = 14.0
+offset_right = 295.0
+offset_bottom = 54.0
+texture_under = ExtResource("3_0ad8t")
+texture_progress = ExtResource("4_x20fu")
+
+[node name="GoldLabel" type="Label" parent="HUD"]
+offset_left = 1104.0
+offset_top = 603.0
+offset_right = 1144.0
+offset_bottom = 637.0
+theme_type_variation = &"HeaderMedium"
+text = "0"
+
+[node name="attackzone" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="attackzone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+shape = SubResource("BoxShape3D_0ad8t")
+
+[connection signal="timeout" from="AttackCooldown" to="." method="_on_attack_cooldown_timeout"]
+[connection signal="body_entered" from="attackzone" to="." method="_on_attackzone_body_entered"]
+[connection signal="body_exited" from="attackzone" to="." method="_on_attackzone_body_exited"]
